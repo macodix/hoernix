@@ -13,6 +13,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
+
+        externalNativeBuild {
+            cmake {
+                // Oboe-Prefab ist gegen die geteilte C++-Standardbibliothek gebaut.
+                arguments += "-DANDROID_STL=c++_shared"
+            }
+        }
     }
 
     buildFeatures {
