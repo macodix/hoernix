@@ -31,4 +31,5 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation(libs.activity.compose)
+    implementation(libs.media3.exoplayer)
 }

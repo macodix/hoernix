@@ -10,6 +10,7 @@
 #include "../dsp/eq_bank.h"
 #include "../dsp/frequenz_verschiebung.h"
 #include "../dsp/kanal_kette.h"
+#include "../dsp/stereo_motor.h"
 #include "kiss_fftr.h"
 
 namespace {
@@ -240,6 +241,38 @@ void testKetteGesamt() {
     PRUEFE(!kette.fehler(), "Gesamtkette: kein Fehlerzustand unter Volllast");
 }
 
+void testStereoMotor() {
+    hoernix::StereoMotor motor(kFs);
+    hoernix::KanalEinstellung rechts;
+    rechts.bandVerstaerkungDb[4] = 12.0f;  // 1000 Hz nur rechts
+    motor.setzeEinstellung(hoernix::StereoMotor::kRechts, rechts);
+
+    const int rahmen = 48000;
+    std::vector<float> verschraenkt(static_cast<size_t>(rahmen) * 2);
+    for (int i = 0; i < rahmen; ++i) {
+        const float wert = 0.04f *
+                std::sin(2.0f * static_cast<float>(M_PI) * 1000.0f * i / kFs);
+        verschraenkt[static_cast<size_t>(2 * i)] = wert;
+        verschraenkt[static_cast<size_t>(2 * i) + 1] = wert;
+    }
+    motor.verarbeiteVerschraenkt(verschraenkt.data(), rahmen);
+
+    std::vector<float> links(static_cast<size_t>(rahmen));
+    std::vector<float> rechtsAus(static_cast<size_t>(rahmen));
+    for (int i = 0; i < rahmen; ++i) {
+        links[static_cast<size_t>(i)] = verschraenkt[static_cast<size_t>(2 * i)];
+        rechtsAus[static_cast<size_t>(i)] =
+                verschraenkt[static_cast<size_t>(2 * i) + 1];
+    }
+    const float rmsLinks = effektivwert(links, 24000);
+    const float rmsRechts = effektivwert(rechtsAus, 24000);
+    PRUEFE(rmsLinks > 0.026f && rmsLinks < 0.031f,
+           "Stereo-Motor: linker Kanal bleibt neutral");
+    PRUEFE(rmsRechts / rmsLinks > 3.0f,
+           "Stereo-Motor: rechter Kanal getrennt verstärkt (Glättung wirksam)");
+    PRUEFE(!motor.fehler(), "Stereo-Motor: kein Fehlerzustand");
+}
+
 }  // namespace
 
 int main() {
@@ -252,6 +285,7 @@ int main() {
     testDeckelung();
     testFailClosed();
     testKetteGesamt();
+    testStereoMotor();
     if (fehlgeschlagen == 0) {
         std::printf("Alle Tests bestanden.\n");
     } else {

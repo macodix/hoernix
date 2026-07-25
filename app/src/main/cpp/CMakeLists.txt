@@ -17,7 +17,8 @@ add_library(hoernix_dsp_kern STATIC
         dsp/eq_bank.cpp
         dsp/frequenz_verschiebung.cpp
         dsp/begrenzer.cpp
-        dsp/kanal_kette.cpp)
+        dsp/kanal_kette.cpp
+        dsp/stereo_motor.cpp)
 target_include_directories(hoernix_dsp_kern PUBLIC dsp)
 target_link_libraries(hoernix_dsp_kern PUBLIC kissfft)
 

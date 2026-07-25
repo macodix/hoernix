@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HörNix</string>
-    <string name="startmeldung">HörNix — Projektgerüst läuft. DSP-Kern: %1$s</string>
+    <string name="dsp_version">DSP-Kern %1$s</string>
+    <string name="dateien_oeffnen">Audiodateien öffnen</string>
+    <string name="keine_datei">Keine Datei geladen</string>
+    <string name="wiedergabe">Wiedergabe</string>
+    <string name="pause">Pause</string>
+    <string name="zurueck">Zurück</string>
+    <string name="weiter">Weiter</string>
+    <string name="testverarbeitung">Testverarbeitung (Höhen stark absenken)</string>
 </resources>
