@@ -1,14 +1,22 @@
 #include <jni.h>
 
+#include <memory>
+#include <mutex>
+
+#include "audio/mikrofon_schleife.h"
 #include "dsp/parameter.h"
 #include "dsp/stereo_motor.h"
 
 namespace {
-constexpr const char* kDspVersion = "0.2.0";
+constexpr const char* kDspVersion = "0.3.0";
 
 hoernix::StereoMotor* motor(jlong griff) {
     return reinterpret_cast<hoernix::StereoMotor*>(griff);
 }
+
+// Eine Mikrofon-Durchleitung je App; Zugriff nur über die JNI-Funktionen.
+std::mutex gSchleifeSchutz;
+std::unique_ptr<hoernix::MikrofonSchleife> gSchleife;
 }  // namespace
 
 extern "C" {
@@ -77,6 +85,36 @@ Java_net_martinhenkel_hoernix_DspBruecke_begrenzerEingriff(JNIEnv*, jobject,
 JNIEXPORT void JNICALL
 Java_net_martinhenkel_hoernix_DspBruecke_ruecksetzen(JNIEnv*, jobject, jlong griff) {
     motor(griff)->ruecksetzen();
+}
+
+// Mikrofon-Durchleitung: Rückgabe ist der Motor-Griff für die
+// Einstellungs-Aufrufe (0 = Start fehlgeschlagen). Der Griff gehört der
+// Schleife und darf nicht über gibFrei freigegeben werden.
+JNIEXPORT jlong JNICALL
+Java_net_martinhenkel_hoernix_DspBruecke_mikStarte(JNIEnv*, jobject,
+                                                   jint mikGeraetId) {
+    std::lock_guard<std::mutex> sperre(gSchleifeSchutz);
+    if (gSchleife) {
+        return 0;
+    }
+    auto schleife = std::make_unique<hoernix::MikrofonSchleife>(mikGeraetId);
+    if (!schleife->starte()) {
+        return 0;
+    }
+    gSchleife = std::move(schleife);
+    return reinterpret_cast<jlong>(gSchleife->motor());
+}
+
+JNIEXPORT void JNICALL
+Java_net_martinhenkel_hoernix_DspBruecke_mikStoppe(JNIEnv*, jobject) {
+    std::lock_guard<std::mutex> sperre(gSchleifeSchutz);
+    gSchleife.reset();
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_martinhenkel_hoernix_DspBruecke_mikFehler(JNIEnv*, jobject) {
+    std::lock_guard<std::mutex> sperre(gSchleifeSchutz);
+    return (gSchleife && gSchleife->fehler()) ? JNI_TRUE : JNI_FALSE;
 }
 
 }  // extern "C"

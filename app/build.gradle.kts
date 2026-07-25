@@ -17,6 +17,7 @@ android {
 
     buildFeatures {
         compose = true
+        prefab = true
     }
 
     externalNativeBuild {
@@ -32,4 +33,5 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation(libs.activity.compose)
     implementation(libs.media3.exoplayer)
+    implementation(libs.oboe)
 }

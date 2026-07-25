@@ -23,8 +23,12 @@ target_include_directories(hoernix_dsp_kern PUBLIC dsp)
 target_link_libraries(hoernix_dsp_kern PUBLIC kissfft)
 
 if(ANDROID)
-    add_library(hoernix_dsp SHARED hoernix_dsp.cpp)
-    target_link_libraries(hoernix_dsp PRIVATE hoernix_dsp_kern)
+    # Oboe kommt als Prefab aus dem Gradle-Abhängigkeitsbaum (gepinnt + Prüfsumme).
+    find_package(oboe REQUIRED CONFIG)
+    add_library(hoernix_dsp SHARED
+            hoernix_dsp.cpp
+            audio/mikrofon_schleife.cpp)
+    target_link_libraries(hoernix_dsp PRIVATE hoernix_dsp_kern oboe::oboe)
 else()
     # Host-Build: Modultests (aufrufbar über ctest).
     enable_testing()

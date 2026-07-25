@@ -9,4 +9,15 @@
     <string name="zurueck">Zurück</string>
     <string name="weiter">Weiter</string>
     <string name="testverarbeitung">Testverarbeitung (Höhen stark absenken)</string>
+    <string name="mik_ueberschrift">Umgebung hören</string>
+    <string name="mik_starten">Umgebung hören starten</string>
+    <string name="mik_stoppen">Stoppen</string>
+    <string name="mik_laeuft">Durchleitung läuft — Mikrofon → Kopfhörer</string>
+    <string name="mik_gestoppt">Durchleitung gestoppt</string>
+    <string name="mik_nur_lautsprecher">Start verweigert: Bitte Kopfhörer anschließen — Ausgabe über den Lautsprecher ist ausgeschlossen (Rückkopplung)</string>
+    <string name="mik_fehler">Durchleitung wegen eines Audio-Fehlers gestoppt</string>
+    <string name="mik_latenz_hinweis">Hinweis: Bluetooth-Wiedergabe verzögert die Durchleitung um 0,1–0,3 s — für Gespräche USB-C- oder Kabel-Kopfhörer verwenden</string>
+    <string name="mik_berechtigung_fehlt">Ohne Mikrofon-Berechtigung ist der Modus „Umgebung hören" nicht möglich</string>
+    <string name="mik_benachrichtigung_kanal">Umgebung hören</string>
+    <string name="mik_benachrichtigung_titel">HörNix: Umgebung hören läuft</string>
 </resources>

@@ -46,4 +46,17 @@ object DspBruecke {
     external fun begrenzerEingriff(griff: Long): Boolean
 
     external fun ruecksetzen(griff: Long)
+
+    /**
+     * Startet die Mikrofon-Durchleitung über das Gerät mit der übergebenen
+     * Eingabe-Geräte-Id (Gerätemikrofon). Rückgabe: Motor-Griff für
+     * [setzeEinstellung] u. a. — gehört der Schleife, nie [gibFrei] rufen.
+     * 0 = Start fehlgeschlagen oder schon aktiv.
+     */
+    external fun mikStarte(mikGeraetId: Int): Long
+
+    external fun mikStoppe()
+
+    /** Stromabriss der Mikrofon-Durchleitung (z. B. Gerät getrennt). */
+    external fun mikFehler(): Boolean
 }
