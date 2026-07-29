@@ -14,6 +14,22 @@ object EinstellungsVerteiler {
     private val griffe = mutableSetOf<Long>()
     private var aktuell: Profil = Profil(ProfilBestand.STANDARD_NAME)
 
+    /** Ein/Aus der Oberfläche: aus = neutrale Kette, Begrenzer bleibt aktiv. */
+    @Volatile
+    var verarbeitungAktiv: Boolean = true
+        private set
+
+    @Synchronized
+    fun setzeVerarbeitung(aktiv: Boolean) {
+        if (verarbeitungAktiv == aktiv) {
+            return
+        }
+        verarbeitungAktiv = aktiv
+        for (griff in griffe) {
+            wendeAn(griff, aktuell)
+        }
+    }
+
     @Synchronized
     fun registriere(griff: Long) {
         if (griff == 0L) {
@@ -36,9 +52,33 @@ object EinstellungsVerteiler {
         }
     }
 
+    /** Läuft mindestens ein Motor (Player oder Mikrofon)? */
+    @Synchronized
+    fun motorenAktiv(): Boolean = griffe.isNotEmpty()
+
+    /** Größte Ausgabespitze aller Motoren seit der letzten Abfrage (linear). */
+    @Synchronized
+    fun spitzenPegel(kanal: Int): Float =
+        griffe.maxOfOrNull { DspBruecke.spitzenPegel(it, kanal) } ?: 0.0f
+
+    @Synchronized
+    fun begrenzerEingriff(): Boolean =
+        griffe.any { DspBruecke.begrenzerEingriff(it) }
+
+    /** Fail-closed-Zustand irgendeines Motors (Ausgabe stummgeschaltet). */
+    @Synchronized
+    fun fehlerVorhanden(): Boolean = griffe.any { DspBruecke.fehler(it) }
+
     private fun wendeAn(griff: Long, profil: Profil) {
-        wendeOhrAn(griff, DspBruecke.KANAL_LINKS, profil.links, profil.schwelleDb)
-        wendeOhrAn(griff, DspBruecke.KANAL_RECHTS, profil.rechts, profil.schwelleDb)
+        // Bei ausgeschalteter Verarbeitung: neutrale Ohren (Bänder 0 dB,
+        // Verschiebung aus); die Limiter-Schwelle des Profils bleibt bestehen.
+        val wirksam = if (verarbeitungAktiv) {
+            profil
+        } else {
+            profil.copy(links = OhrEinstellung(), rechts = OhrEinstellung())
+        }
+        wendeOhrAn(griff, DspBruecke.KANAL_LINKS, wirksam.links, wirksam.schwelleDb)
+        wendeOhrAn(griff, DspBruecke.KANAL_RECHTS, wirksam.rechts, wirksam.schwelleDb)
     }
 
     private fun wendeOhrAn(griff: Long, kanal: Int, ohr: OhrEinstellung, schwelleDb: Float) {

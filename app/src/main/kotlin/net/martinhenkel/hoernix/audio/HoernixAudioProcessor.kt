@@ -23,26 +23,6 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
     private var eingangsKanaele = 2
     private var verschraenkt = FloatArray(0)
 
-    /** Provisorisch bis zur echten Profil-Oberfläche (Umsetzungsschritt 6). */
-    @Volatile
-    var testprofilAktiv = false
-        private set
-
-    fun setzeTestprofil(aktiv: Boolean) {
-        testprofilAktiv = aktiv
-        synchronized(this) {
-            if (griff == 0L) {
-                return
-            }
-            if (aktiv) {
-                wendeTestprofilAn()
-            } else {
-                // Erneutes Anmelden spielt das aktive Profil wieder ein.
-                EinstellungsVerteiler.registriere(griff)
-            }
-        }
-    }
-
     override fun onConfigure(
         inputAudioFormat: AudioProcessor.AudioFormat
     ): AudioProcessor.AudioFormat {
@@ -104,9 +84,6 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
                 griff = DspBruecke.erzeuge(abtastrate.toFloat())
                 motorAbtastrate = abtastrate
                 EinstellungsVerteiler.registriere(griff)
-                if (testprofilAktiv) {
-                    wendeTestprofilAn()
-                }
             } else if (griff != 0L) {
                 DspBruecke.ruecksetzen(griff)
             }
@@ -125,29 +102,4 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
     }
 
     private var motorAbtastrate = 0
-
-    /**
-     * Testprofil: Höhen ab 2 kHz stark absenken — deutlich hörbar und
-     * ungefährlich (keine Verstärkung). Überlagert das aktive Profil, bis der
-     * Schalter aus- oder ein neues Profil eingespielt wird.
-     */
-    private fun wendeTestprofilAn() {
-        val baender = FloatArray(DspBruecke.ANZAHL_BAENDER)
-        for (b in 6 until DspBruecke.ANZAHL_BAENDER) {
-            baender[b] = -24.0f
-        }
-        for (kanal in intArrayOf(DspBruecke.KANAL_LINKS, DspBruecke.KANAL_RECHTS)) {
-            DspBruecke.setzeEinstellung(
-                griff, kanal, baender,
-                kompressionAktiv = false,
-                grenzFrequenzHz = 3000.0f,
-                verhaeltnis = 2.0f,
-                transpositionAktiv = false,
-                quelleVonHz = 6000.0f,
-                quelleBisHz = 10000.0f,
-                versatzHz = 3000.0f,
-                schwelleDb = -12.0f,
-            )
-        }
-    }
 }

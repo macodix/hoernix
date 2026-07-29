@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <atomic>
 #include <mutex>
 #include <optional>
 #include <vector>
@@ -31,8 +32,13 @@ public:
     int latenz() const;
     void ruecksetzen();
 
+    // Betragsspitze der Ausgabe seit der letzten Abfrage (Pegelanzeige);
+    // die Abfrage setzt den Merker zurück.
+    float spitzenPegel(int kanal);
+
 private:
     void uebernehmeAusstehende();
+    void merkeSpitze(int kanal, const float* daten, int rahmen);
 
     KanalKette links_;
     KanalKette rechts_;
@@ -40,6 +46,7 @@ private:
     std::array<std::optional<KanalEinstellung>, 2> ausstehend_;
     std::vector<float> pufferLinks_;
     std::vector<float> pufferRechts_;
+    std::array<std::atomic<float>, 2> spitze_{};
 };
 
 }  // namespace hoernix

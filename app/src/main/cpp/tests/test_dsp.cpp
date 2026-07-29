@@ -273,6 +273,26 @@ void testStereoMotor() {
     PRUEFE(!motor.fehler(), "Stereo-Motor: kein Fehlerzustand");
 }
 
+void testSpitzenPegel() {
+    hoernix::StereoMotor motor(kFs);
+    const int rahmen = 4800;
+    std::vector<float> verschraenkt(static_cast<size_t>(rahmen) * 2, 0.0f);
+    for (int i = 0; i < rahmen; ++i) {
+        // 0,1 ≙ −20 dBFS, deutlich unter der Begrenzer-Schwelle (−12 dBFS).
+        verschraenkt[static_cast<size_t>(2 * i)] = 0.1f *
+                std::sin(2.0f * static_cast<float>(M_PI) * 1000.0f * i / kFs);
+    }
+    motor.verarbeiteVerschraenkt(verschraenkt.data(), rahmen);
+
+    const float links = motor.spitzenPegel(hoernix::StereoMotor::kLinks);
+    const float rechts = motor.spitzenPegel(hoernix::StereoMotor::kRechts);
+    PRUEFE(links > 0.09f && links < 0.11f,
+           "Spitzenpegel: linker Kanal meldet die Signalspitze");
+    PRUEFE(rechts < 1e-6f, "Spitzenpegel: stiller Kanal meldet 0");
+    PRUEFE(motor.spitzenPegel(hoernix::StereoMotor::kLinks) == 0.0f,
+           "Spitzenpegel: Abfrage setzt den Merker zurück");
+}
+
 }  // namespace
 
 int main() {
@@ -286,6 +306,7 @@ int main() {
     testFailClosed();
     testKetteGesamt();
     testStereoMotor();
+    testSpitzenPegel();
     if (fehlgeschlagen == 0) {
         std::printf("Alle Tests bestanden.\n");
     } else {

@@ -1,5 +1,7 @@
 #include "stereo_motor.h"
 
+#include <cmath>
+
 namespace hoernix {
 
 StereoMotor::StereoMotor(float abtastrateHz)
@@ -39,6 +41,8 @@ void StereoMotor::verarbeiteVerschraenkt(float* daten, int rahmen) {
     }
     links_.verarbeite(pufferLinks_.data(), pufferLinks_.data(), rahmen);
     rechts_.verarbeite(pufferRechts_.data(), pufferRechts_.data(), rahmen);
+    merkeSpitze(kLinks, pufferLinks_.data(), rahmen);
+    merkeSpitze(kRechts, pufferRechts_.data(), rahmen);
     for (int i = 0; i < rahmen; ++i) {
         daten[2 * i] = pufferLinks_[static_cast<size_t>(i)];
         daten[2 * i + 1] = pufferRechts_[static_cast<size_t>(i)];
@@ -60,6 +64,32 @@ int StereoMotor::latenz() const {
 void StereoMotor::ruecksetzen() {
     links_.ruecksetzen();
     rechts_.ruecksetzen();
+    spitze_[kLinks].store(0.0f, std::memory_order_relaxed);
+    spitze_[kRechts].store(0.0f, std::memory_order_relaxed);
+}
+
+float StereoMotor::spitzenPegel(int kanal) {
+    if (kanal != kLinks && kanal != kRechts) {
+        return 0.0f;
+    }
+    return spitze_[static_cast<size_t>(kanal)].exchange(0.0f,
+                                                        std::memory_order_relaxed);
+}
+
+void StereoMotor::merkeSpitze(int kanal, const float* daten, int rahmen) {
+    float maximum = 0.0f;
+    for (int i = 0; i < rahmen; ++i) {
+        const float betrag = std::fabs(daten[i]);
+        if (betrag > maximum) {
+            maximum = betrag;
+        }
+    }
+    auto& spitze = spitze_[static_cast<size_t>(kanal)];
+    float bisher = spitze.load(std::memory_order_relaxed);
+    while (maximum > bisher &&
+           !spitze.compare_exchange_weak(bisher, maximum,
+                                         std::memory_order_relaxed)) {
+    }
 }
 
 }  // namespace hoernix

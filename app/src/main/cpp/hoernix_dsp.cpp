@@ -8,7 +8,7 @@
 #include "dsp/stereo_motor.h"
 
 namespace {
-constexpr const char* kDspVersion = "0.3.0";
+constexpr const char* kDspVersion = "0.4.0";
 
 hoernix::StereoMotor* motor(jlong griff) {
     return reinterpret_cast<hoernix::StereoMotor*>(griff);
@@ -85,6 +85,12 @@ Java_net_martinhenkel_hoernix_DspBruecke_begrenzerEingriff(JNIEnv*, jobject,
 JNIEXPORT void JNICALL
 Java_net_martinhenkel_hoernix_DspBruecke_ruecksetzen(JNIEnv*, jobject, jlong griff) {
     motor(griff)->ruecksetzen();
+}
+
+JNIEXPORT jfloat JNICALL
+Java_net_martinhenkel_hoernix_DspBruecke_spitzenPegel(JNIEnv*, jobject,
+                                                      jlong griff, jint kanal) {
+    return motor(griff)->spitzenPegel(kanal);
 }
 
 // Mikrofon-Durchleitung: Rückgabe ist der Motor-Griff für die

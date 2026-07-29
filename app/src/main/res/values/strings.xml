@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HörNix</string>
-    <string name="dsp_version">DSP-Kern %1$s</string>
+
+    <!-- Reiter -->
+    <string name="reiter_start">Start</string>
+    <string name="reiter_eq">Equalizer</string>
+    <string name="reiter_verschiebung">Verschiebung</string>
+    <string name="reiter_audiogramm">Audiogramm</string>
+    <string name="reiter_profile">Profile</string>
+
+    <!-- Hauptansicht -->
+    <string name="aktives_profil">Aktives Profil:</string>
+    <string name="verarbeitung_aktiv">Verarbeitung eingeschaltet</string>
+    <string name="gesamtlautstaerke">Gesamtlautstärke</string>
+    <string name="begrenzer_eingriff">⚠ Begrenzer greift ein</string>
+    <string name="begrenzer_schwelle_wert">Begrenzer-Ansprechschwelle: %1$d dBFS</string>
+    <string name="audio_fehler_stumm">Audio-Fehler erkannt — Ausgabe stummgeschaltet</string>
+    <string name="gehoerschutz_hinweis">Gehörschutz: Der Begrenzer deckelt nur den digitalen Ausgang der App (−1 dBFS). Die tatsächliche Lautheit am Ohr hängt zusätzlich von Systemlautstärke und Kopfhörer-Empfindlichkeit ab. HörNix ist eine Einstellhilfe, kein Medizinprodukt und ersetzt keine HNO-Diagnostik.</string>
+
+    <!-- Player -->
+    <string name="player_ueberschrift">Player</string>
     <string name="dateien_oeffnen">Audiodateien öffnen</string>
     <string name="keine_datei">Keine Datei geladen</string>
     <string name="wiedergabe">Wiedergabe</string>
     <string name="pause">Pause</string>
     <string name="zurueck">Zurück</string>
     <string name="weiter">Weiter</string>
-    <string name="testverarbeitung">Testverarbeitung (Höhen stark absenken)</string>
+
+    <!-- Mikrofon-Modus -->
     <string name="mik_ueberschrift">Umgebung hören</string>
     <string name="mik_starten">Umgebung hören starten</string>
     <string name="mik_stoppen">Stoppen</string>
@@ -20,4 +39,55 @@
     <string name="mik_berechtigung_fehlt">Ohne Mikrofon-Berechtigung ist der Modus „Umgebung hören" nicht möglich</string>
     <string name="mik_benachrichtigung_kanal">Umgebung hören</string>
     <string name="mik_benachrichtigung_titel">HörNix: Umgebung hören läuft</string>
+
+    <!-- Seitenwahl / Koppeln -->
+    <string name="seite_links">Links</string>
+    <string name="seite_rechts">Rechts</string>
+    <string name="seite_gekoppelt">Gekoppelt</string>
+    <string name="koppeln_titel">Ohren koppeln</string>
+    <string name="koppeln_frage">Beim Koppeln gelten für beide Ohren dieselben Einstellungen. Welche Seite soll übernommen werden?</string>
+    <string name="koppeln_links_beide">Links → beide</string>
+    <string name="koppeln_rechts_beide">Rechts → beide</string>
+
+    <!-- EQ -->
+    <string name="eq_hinweis">Verstärkung (+) oder Absenkung (−) je Frequenzband, −24 bis +24 dB. Der Begrenzer schützt vor Übersteuerung.</string>
+    <string name="band_hz">%1$s Hz</string>
+    <string name="wert_db">%1$d dB</string>
+
+    <!-- Verschiebung -->
+    <string name="kompression_ueberschrift">Frequenzkompression</string>
+    <string name="kompression_erklaerung">Staucht hohe Töne oberhalb der Grenzfrequenz in den hörbaren Bereich. Beispiel: Bei Grenze 2000 Hz und Verhältnis 2 landet ein Ton von 6000 Hz bei 4000 Hz.</string>
+    <string name="kompression_aktiv">Kompression eingeschaltet</string>
+    <string name="grenzfrequenz_wert">Grenzfrequenz: %1$d Hz</string>
+    <string name="verhaeltnis_wert">Verhältnis: %1$s : 1</string>
+    <string name="transposition_ueberschrift">Frequenztransposition</string>
+    <string name="transposition_erklaerung">Mischt einen hohen Quellbereich zusätzlich nach unten verschoben bei — das Original bleibt hörbar. Beispiel: Quellbereich 6000–10000 Hz, Versatz 3000 Hz nach unten.</string>
+    <string name="transposition_aktiv">Transposition eingeschaltet</string>
+    <string name="quelle_von_wert">Quellbereich von: %1$d Hz</string>
+    <string name="quelle_bis_wert">Quellbereich bis: %1$d Hz</string>
+    <string name="versatz_wert">Versatz nach unten: %1$d Hz</string>
+
+    <!-- Audiogramm -->
+    <string name="audiogramm_erklaerung">Hörverlust in dB je Frequenz eintragen (aus dem Audiogramm vom HNO-Arzt oder Hörakustiker). „Übernehmen" belegt die Bandverstärkungen mit dem halben Hörverlust vor (gedeckelt auf +24 dB) — danach im Equalizer nachjustierbar.</string>
+    <string name="audiogramm_frequenz">Hz</string>
+    <string name="audiogramm_uebernehmen">In Bandverstärkungen übernehmen</string>
+    <string name="audiogramm_uebernommen">Übernommen — Feinabstimmung im Reiter „Equalizer"</string>
+    <string name="audiogramm_eingabe_fehler">Eingabe ungültig: nur ganze Zahlen von 0 bis 120</string>
+
+    <!-- Profile -->
+    <string name="profil_neu">Neues Profil</string>
+    <string name="profil_name">Profilname</string>
+    <string name="profil_aktiv_markierung">%1$s (aktiv)</string>
+    <string name="profil_aktivieren">Aktivieren</string>
+    <string name="profil_umbenennen">Umbenennen</string>
+    <string name="profil_duplizieren">Duplizieren</string>
+    <string name="profil_loeschen">Löschen</string>
+    <string name="profil_loeschen_frage">Profil „%1$s" endgültig löschen?</string>
+    <string name="profil_exportieren">Exportieren</string>
+    <string name="profil_importieren">Importieren</string>
+    <string name="profil_importiert">Profil importiert und aktiviert</string>
+    <string name="profil_exportiert">Profil exportiert</string>
+    <string name="profil_aktion_fehlgeschlagen">Aktion fehlgeschlagen — Name ungültig oder schon vergeben?</string>
+    <string name="uebernehmen">Übernehmen</string>
+    <string name="abbrechen">Abbrechen</string>
 </resources>

@@ -45,6 +45,12 @@ object DspBruecke {
     /** Greift der Begrenzer aktuell ein? (Pegelanzeige) */
     external fun begrenzerEingriff(griff: Long): Boolean
 
+    /**
+     * Betragsspitze der Ausgabe (linear, 0…1+) seit der letzten Abfrage;
+     * die Abfrage setzt den Merker zurück.
+     */
+    external fun spitzenPegel(griff: Long, kanal: Int): Float
+
     external fun ruecksetzen(griff: Long)
 
     /**
