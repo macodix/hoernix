@@ -6,6 +6,7 @@ import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.BaseAudioProcessor
 import androidx.media3.common.util.UnstableApi
 import net.martinhenkel.hoernix.DspBruecke
+import net.martinhenkel.hoernix.profil.EinstellungsVerteiler
 
 /**
  * Hängt den DSP-Kern in die Media3-Wiedergabekette ein (Plan Kap. 2.4).
@@ -30,8 +31,14 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
     fun setzeTestprofil(aktiv: Boolean) {
         testprofilAktiv = aktiv
         synchronized(this) {
-            if (griff != 0L) {
-                wendeEinstellungenAn()
+            if (griff == 0L) {
+                return
+            }
+            if (aktiv) {
+                wendeTestprofilAn()
+            } else {
+                // Erneutes Anmelden spielt das aktive Profil wieder ein.
+                EinstellungsVerteiler.registriere(griff)
             }
         }
     }
@@ -89,13 +96,17 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
     override fun onFlush() {
         synchronized(this) {
             if (griff != 0L && abtastrate != motorAbtastrate) {
+                EinstellungsVerteiler.entferne(griff)
                 DspBruecke.gibFrei(griff)
                 griff = 0L
             }
             if (griff == 0L && abtastrate > 0) {
                 griff = DspBruecke.erzeuge(abtastrate.toFloat())
                 motorAbtastrate = abtastrate
-                wendeEinstellungenAn()
+                EinstellungsVerteiler.registriere(griff)
+                if (testprofilAktiv) {
+                    wendeTestprofilAn()
+                }
             } else if (griff != 0L) {
                 DspBruecke.ruecksetzen(griff)
             }
@@ -105,6 +116,7 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
     override fun onReset() {
         synchronized(this) {
             if (griff != 0L) {
+                EinstellungsVerteiler.entferne(griff)
                 DspBruecke.gibFrei(griff)
                 griff = 0L
                 motorAbtastrate = 0
@@ -114,14 +126,15 @@ class HoernixAudioProcessor : BaseAudioProcessor() {
 
     private var motorAbtastrate = 0
 
-    private fun wendeEinstellungenAn() {
-        // Testprofil: Höhen ab 2 kHz stark absenken — deutlich hörbar und
-        // ungefährlich (keine Verstärkung). Neutral: alle Bänder 0 dB.
+    /**
+     * Testprofil: Höhen ab 2 kHz stark absenken — deutlich hörbar und
+     * ungefährlich (keine Verstärkung). Überlagert das aktive Profil, bis der
+     * Schalter aus- oder ein neues Profil eingespielt wird.
+     */
+    private fun wendeTestprofilAn() {
         val baender = FloatArray(DspBruecke.ANZAHL_BAENDER)
-        if (testprofilAktiv) {
-            for (b in 6 until DspBruecke.ANZAHL_BAENDER) {
-                baender[b] = -24.0f
-            }
+        for (b in 6 until DspBruecke.ANZAHL_BAENDER) {
+            baender[b] = -24.0f
         }
         for (kanal in intArrayOf(DspBruecke.KANAL_LINKS, DspBruecke.KANAL_RECHTS)) {
             DspBruecke.setzeEinstellung(

@@ -45,10 +45,12 @@ import androidx.media3.exoplayer.audio.DefaultAudioSink
 import net.martinhenkel.hoernix.audio.HoernixAudioProcessor
 import net.martinhenkel.hoernix.audio.MikrofonDienst
 import net.martinhenkel.hoernix.audio.MikrofonZustand
+import net.martinhenkel.hoernix.profil.ProfilVerwaltung
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ProfilVerwaltung.initialisiere(applicationContext)
         setContent { PlayerAnsicht() }
     }
 }

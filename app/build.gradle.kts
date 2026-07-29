@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -41,4 +42,7 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.media3.exoplayer)
     implementation(libs.oboe)
+    implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.junit)
 }

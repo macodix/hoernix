@@ -16,6 +16,8 @@ import android.os.IBinder
 import android.os.Looper
 import net.martinhenkel.hoernix.DspBruecke
 import net.martinhenkel.hoernix.R
+import net.martinhenkel.hoernix.profil.EinstellungsVerteiler
+import net.martinhenkel.hoernix.profil.ProfilVerwaltung
 
 /**
  * Vordergrund-Dienst der Mikrofon-Durchleitung (Plan Kap. 2.3).
@@ -73,6 +75,8 @@ class MikrofonDienst : Service() {
             beende(MikrofonZustand.Status.FEHLER)
             return START_NOT_STICKY
         }
+        ProfilVerwaltung.initialisiere(applicationContext)
+        EinstellungsVerteiler.registriere(griff)
 
         audioManager.registerAudioDeviceCallback(geraeteBeobachter, null)
         pruefTakt.postDelayed(fehlerPruefung, 1000)
@@ -86,6 +90,7 @@ class MikrofonDienst : Service() {
     override fun onDestroy() {
         pruefTakt.removeCallbacksAndMessages(null)
         runCatching { audioManager.unregisterAudioDeviceCallback(geraeteBeobachter) }
+        EinstellungsVerteiler.entferne(griff)
         DspBruecke.mikStoppe()
         griff = 0L
         if (MikrofonZustand.status.value == MikrofonZustand.Status.LAEUFT) {
